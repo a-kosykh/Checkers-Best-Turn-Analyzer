@@ -1,4 +1,4 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
@@ -12,18 +12,18 @@
 #define MOVE_RED 0
 #define MOVE_BLACK 1
 
-// победа
+// РїРѕР±РµРґР°
 enum class Win {
-	winNo, // нет победы
+	winNo, // РЅРµС‚ РїРѕР±РµРґС‹
 	winRed,
 	winBlack
 };
 
-#define WIN_VALUE 100 // Очки победы
+#define WIN_VALUE 100 // РћС‡РєРё РїРѕР±РµРґС‹
 
-#define KING_COEF 2 // коэфициент королевской шашки
+#define KING_COEF 2 // РєРѕСЌС„РёС†РёРµРЅС‚ РєРѕСЂРѕР»РµРІСЃРєРѕР№ С€Р°С€РєРё
 
-// ошибки 
+// РѕС€РёР±РєРё 
 enum class InputError {
 	noError,
 	badSize,
@@ -33,7 +33,7 @@ enum class InputError {
 	emptyBoard
 };
 
-// чтение входных данных
+// С‡С‚РµРЅРёРµ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
 std::string getStringStartPos(const std::string &filepath) {
 	std::string pos;
 
@@ -51,10 +51,10 @@ std::string getStringStartPos(const std::string &filepath) {
 	return pos;
 }
 
-// шашечная доска
+// С€Р°С€РµС‡РЅР°СЏ РґРѕСЃРєР°
 class CheckersBoard {
-	std::string 				_board; // доска в виде строки
-	bool 						_whosTurn; // флаг "чей ход" (красных или черных)
+	std::string 				_board; // РґРѕСЃРєР° РІ РІРёРґРµ СЃС‚СЂРѕРєРё
+	bool 						_whosTurn; // С„Р»Р°Рі "С‡РµР№ С…РѕРґ" (РєСЂР°СЃРЅС‹С… РёР»Рё С‡РµСЂРЅС‹С…)
 
 public:
 	CheckersBoard() {}
@@ -64,7 +64,7 @@ public:
 		if (positions.at(64) == 'r')
 			_whosTurn = MOVE_RED;
 	}
-	// геттеры полей
+	// РіРµС‚С‚РµСЂС‹ РїРѕР»РµР№
 	std::string getBoard() const {
 		return _board;
 	}
@@ -85,15 +85,15 @@ public:
 	}
 };
 
-// узел дерева
+// СѓР·РµР» РґРµСЂРµРІР°
 class TreeNode {
-	CheckersBoard 				_cb; // доска
-	TreeNode* 					_parent; // указатель на родительский узел
-	std::vector<TreeNode*> 		_children; // массив всех возможных следующих ходов
-	std::string 				_prevMove; // нотация предыдущего хода
-	unsigned int 				_depth; // глубина узла в дереве
-	double 						_value, _alpha, _beta; // значения очков, альфа, бета
-	int 						_win; // обазначение победы одной из стороны
+	CheckersBoard 				_cb; // РґРѕСЃРєР°
+	TreeNode* 					_parent; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓР·РµР»
+	std::vector<TreeNode*> 		_children; // РјР°СЃСЃРёРІ РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С… СЃР»РµРґСѓСЋС‰РёС… С…РѕРґРѕРІ
+	std::string 				_prevMove; // РЅРѕС‚Р°С†РёСЏ РїСЂРµРґС‹РґСѓС‰РµРіРѕ С…РѕРґР°
+	unsigned int 				_depth; // РіР»СѓР±РёРЅР° СѓР·Р»Р° РІ РґРµСЂРµРІРµ
+	double 						_value, _alpha, _beta; // Р·РЅР°С‡РµРЅРёСЏ РѕС‡РєРѕРІ, Р°Р»СЊС„Р°, Р±РµС‚Р°
+	int 						_win; // РѕР±Р°Р·РЅР°С‡РµРЅРёРµ РїРѕР±РµРґС‹ РѕРґРЅРѕР№ РёР· СЃС‚РѕСЂРѕРЅС‹
 
 public:
 	TreeNode() {}
@@ -122,7 +122,7 @@ public:
 			_value = (-1) * WIN_VALUE;
 		}
 	}
-	// геттеры полей
+	// РіРµС‚С‚РµСЂС‹ РїРѕР»РµР№
 	CheckersBoard getCB() const {
 		return _cb;
 	}
@@ -150,7 +150,7 @@ public:
 	int getWin() const {
 		return _win;
 	}
-	// сеттеры полей
+	// СЃРµС‚С‚РµСЂС‹ РїРѕР»РµР№
 	void setValue(double val) {
 		_value = val;
 	}
@@ -173,12 +173,12 @@ public:
 	}
 };
 
-// класс "шашки". тут описаны правила игры. тут строится дерево всех возможных ходов
+// РєР»Р°СЃСЃ "С€Р°С€РєРё". С‚СѓС‚ РѕРїРёСЃР°РЅС‹ РїСЂР°РІРёР»Р° РёРіСЂС‹. С‚СѓС‚ СЃС‚СЂРѕРёС‚СЃСЏ РґРµСЂРµРІРѕ РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С… С…РѕРґРѕРІ
 class Checkers {
-	std::queue<TreeNode*> 		_nodeQ; // очередь узлов для их обработки
-	TreeNode* 					_currentNode; // указатель на текущий узел
+	std::queue<TreeNode*> 		_nodeQ; // РѕС‡РµСЂРµРґСЊ СѓР·Р»РѕРІ РґР»СЏ РёС… РѕР±СЂР°Р±РѕС‚РєРё
+	TreeNode* 					_currentNode; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° С‚РµРєСѓС‰РёР№ СѓР·РµР»
 
-	bool _isLegaltoKing(int finalPos) // проверка может ли обычна шашка стать королем
+	bool _isLegaltoKing(int finalPos) // РїСЂРѕРІРµСЂРєР° РјРѕР¶РµС‚ Р»Рё РѕР±С‹С‡РЅР° С€Р°С€РєР° СЃС‚Р°С‚СЊ РєРѕСЂРѕР»РµРј
 	{
 		if (_currentNode->getCB().getWhosTurn() == MOVE_RED) {
 			if (finalPos >= 56) {
@@ -192,7 +192,7 @@ class Checkers {
 		}
 		return false;
 	}
-	void _createNoFightNode(int startPos, int finalPos) // создание дочернего узла при тихом ходе
+	void _createNoFightNode(int startPos, int finalPos) // СЃРѕР·РґР°РЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїСЂРё С‚РёС…РѕРј С…РѕРґРµ
 	{
 		std::string tempBoard = _currentNode->getCB().getBoard();
 
@@ -217,7 +217,7 @@ class Checkers {
 		_nodeQ.push(_currentNode->getChildren().back());
 	}
 
-	void _moveNoFightKing(int pos) // условия тихого хода короля
+	void _moveNoFightKing(int pos) // СѓСЃР»РѕРІРёСЏ С‚РёС…РѕРіРѕ С…РѕРґР° РєРѕСЂРѕР»СЏ
 	{
 		// move king up left
 		if (pos % 8 != 0) {
@@ -264,7 +264,7 @@ class Checkers {
 			}
 		}
 	}
-	void _moveNoFightRed(int pos) // условия тихого хода красной шашки
+	void _moveNoFightRed(int pos) // СѓСЃР»РѕРІРёСЏ С‚РёС…РѕРіРѕ С…РѕРґР° РєСЂР°СЃРЅРѕР№ С€Р°С€РєРё
 	{
 		// SIMPLE MOVE LEFT
 		if (pos % 8 != 0) {
@@ -279,7 +279,7 @@ class Checkers {
 			}
 		}
 	}
-	void _moveNoFightBlack(int pos) // условия тихого хода черной шашки
+	void _moveNoFightBlack(int pos) // СѓСЃР»РѕРІРёСЏ С‚РёС…РѕРіРѕ С…РѕРґР° С‡РµСЂРЅРѕР№ С€Р°С€РєРё
 	{
 		if (pos % 8 != 7) {
 			if (_currentNode->getCB().getBoard().at(pos - 7) == '0') {
@@ -293,7 +293,7 @@ class Checkers {
 		}
 	}
 
-	void _moveCombatKing(int pos, std::string tempBoard, std::string tempNotation) // условия и создание дочернего узла при бое короля
+	void _moveCombatKing(int pos, std::string tempBoard, std::string tempNotation) // СѓСЃР»РѕРІРёСЏ Рё СЃРѕР·РґР°РЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїСЂРё Р±РѕРµ РєРѕСЂРѕР»СЏ
 	{
 		char friendPiece, friendKing, oppoPiece, oppoKing;
 		if (_currentNode->getCB().getWhosTurn() == MOVE_RED) {
@@ -436,7 +436,7 @@ class Checkers {
 			return;
 		}
 	}
-	void _moveCombatRed(int pos, std::string tempBoard, std::string tempNotation) // условия и создание дочернего узла при бое красной шашки
+	void _moveCombatRed(int pos, std::string tempBoard, std::string tempNotation) // СѓСЃР»РѕРІРёСЏ Рё СЃРѕР·РґР°РЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїСЂРё Р±РѕРµ РєСЂР°СЃРЅРѕР№ С€Р°С€РєРё
 	{
 		// CHECK FORWARD MOVE LEFT
 		bool combat = false;
@@ -529,7 +529,7 @@ class Checkers {
 			return;
 		}
 	}
-	void _moveCombatBlack(int pos, std::string tempBoard, std::string tempNotation) // условия и создание дочернего узла при бое черной шашки
+	void _moveCombatBlack(int pos, std::string tempBoard, std::string tempNotation) // СѓСЃР»РѕРІРёСЏ Рё СЃРѕР·РґР°РЅРёРµ РґРѕС‡РµСЂРЅРµРіРѕ СѓР·Р»Р° РїСЂРё Р±РѕРµ С‡РµСЂРЅРѕР№ С€Р°С€РєРё
 	{
 		bool combat = false;
 		if (pos >= 19) {
@@ -623,56 +623,56 @@ class Checkers {
 		}
 	}
 
-	void _makeMove() // попытка сделать ход
+	void _makeMove() // РїРѕРїС‹С‚РєР° СЃРґРµР»Р°С‚СЊ С…РѕРґ
 	{
-		// для каждой клетки текущего узла 
+		// РґР»СЏ РєР°Р¶РґРѕР№ РєР»РµС‚РєРё С‚РµРєСѓС‰РµРіРѕ СѓР·Р»Р° 
 		for (unsigned int i = 0; i < _currentNode->getCB().getBoard().size() - 1; ++i) {
-			// если ход красных
+			// РµСЃР»Рё С…РѕРґ РєСЂР°СЃРЅС‹С…
 			if ((_currentNode->getCB().getBoard().at(i) == 'r' || _currentNode->getCB().getBoard().at(i) == 'R')
 				&& _currentNode->getCB().getWhosTurn() == MOVE_RED) {
 
 				auto currChildSize = _currentNode->getChildren().size();
-				// Проверка возможности вступить в бой если обычная шашка
+				// РџСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІСЃС‚СѓРїРёС‚СЊ РІ Р±РѕР№ РµСЃР»Рё РѕР±С‹С‡РЅР°СЏ С€Р°С€РєР°
 				if (_currentNode->getCB().getBoard().at(i) == 'r') {
 					_moveCombatRed(i, _currentNode->getCB().getBoard(), std::to_string(i));
 				}
-				// Проверка возможности вступить в бой если король
+				// РџСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІСЃС‚СѓРїРёС‚СЊ РІ Р±РѕР№ РµСЃР»Рё РєРѕСЂРѕР»СЊ
 				if (_currentNode->getCB().getBoard().at(i) == 'R') {
 					_moveCombatKing(i, _currentNode->getCB().getBoard(), std::to_string(i));
 				}
-				// если боя обычной шашки не было (очередь не увеличилась), то попытка тихого хода
+				// РµСЃР»Рё Р±РѕСЏ РѕР±С‹С‡РЅРѕР№ С€Р°С€РєРё РЅРµ Р±С‹Р»Рѕ (РѕС‡РµСЂРµРґСЊ РЅРµ СѓРІРµР»РёС‡РёР»Р°СЃСЊ), С‚Рѕ РїРѕРїС‹С‚РєР° С‚РёС…РѕРіРѕ С…РѕРґР°
 				if (_currentNode->getChildren().size() == currChildSize &&
 					(i < 56) && _currentNode->getCB().getBoard().at(i) == 'r')
 				{
 					_moveNoFightRed(i);
 				}
-				// если боя короля не было (очередь не увеличилась), то попытка тихого хода
+				// РµСЃР»Рё Р±РѕСЏ РєРѕСЂРѕР»СЏ РЅРµ Р±С‹Р»Рѕ (РѕС‡РµСЂРµРґСЊ РЅРµ СѓРІРµР»РёС‡РёР»Р°СЃСЊ), С‚Рѕ РїРѕРїС‹С‚РєР° С‚РёС…РѕРіРѕ С…РѕРґР°
 				if (_currentNode->getChildren().size() == currChildSize &&
 					_currentNode->getCB().getBoard().at(i) == 'R')
 				{
 					_moveNoFightKing(i);
 				}
 			}
-			// если ход черных
+			// РµСЃР»Рё С…РѕРґ С‡РµСЂРЅС‹С…
 			if ((_currentNode->getCB().getBoard().at(i) == 'b' || _currentNode->getCB().getBoard().at(i) == 'B') &&
 				_currentNode->getCB().getWhosTurn() == MOVE_BLACK) {
 
 				auto currChildSize = _currentNode->getChildren().size();
-				// Проверка возможности вступить в бой если обычная шашка
+				// РџСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІСЃС‚СѓРїРёС‚СЊ РІ Р±РѕР№ РµСЃР»Рё РѕР±С‹С‡РЅР°СЏ С€Р°С€РєР°
 				if (_currentNode->getCB().getBoard().at(i) == 'b') {
 					_moveCombatBlack(i, _currentNode->getCB().getBoard(), std::to_string(i));
 				}
-				// Проверка возможности вступить в бой если король
+				// РџСЂРѕРІРµСЂРєР° РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё РІСЃС‚СѓРїРёС‚СЊ РІ Р±РѕР№ РµСЃР»Рё РєРѕСЂРѕР»СЊ
 				if (_currentNode->getCB().getBoard().at(i) == 'B') {
 					_moveCombatKing(i, _currentNode->getCB().getBoard(), std::to_string(i));
 				}
-				// если боя обычной шашки не было (очередь не увеличилась), то попытка тихого хода
+				// РµСЃР»Рё Р±РѕСЏ РѕР±С‹С‡РЅРѕР№ С€Р°С€РєРё РЅРµ Р±С‹Р»Рѕ (РѕС‡РµСЂРµРґСЊ РЅРµ СѓРІРµР»РёС‡РёР»Р°СЃСЊ), С‚Рѕ РїРѕРїС‹С‚РєР° С‚РёС…РѕРіРѕ С…РѕРґР°
 				if (_currentNode->getChildren().size() == currChildSize &&
 					(i > 7) && _currentNode->getCB().getBoard().at(i) == 'b')
 				{
 					_moveNoFightBlack(i);
 				}
-				// если боя короля не было (очередь не увеличилась), то попытка тихого хода
+				// РµСЃР»Рё Р±РѕСЏ РєРѕСЂРѕР»СЏ РЅРµ Р±С‹Р»Рѕ (РѕС‡РµСЂРµРґСЊ РЅРµ СѓРІРµР»РёС‡РёР»Р°СЃСЊ), С‚Рѕ РїРѕРїС‹С‚РєР° С‚РёС…РѕРіРѕ С…РѕРґР°
 				if (_currentNode->getChildren().size() == currChildSize &&
 					_currentNode->getCB().getBoard().at(i) == 'B') {
 					_moveNoFightKing(i);
@@ -680,7 +680,7 @@ class Checkers {
 			}
 			else continue;
 		}
-		// если у не было возможности хода (тупик), победа другой стороны
+		// РµСЃР»Рё Сѓ РЅРµ Р±С‹Р»Рѕ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё С…РѕРґР° (С‚СѓРїРёРє), РїРѕР±РµРґР° РґСЂСѓРіРѕР№ СЃС‚РѕСЂРѕРЅС‹
 		if (_currentNode->getChildren().size() == 0) {
 			if (_currentNode->getCB().getWhosTurn() == MOVE_RED) {
 				_currentNode->setWin((int)Win::winBlack);
@@ -692,12 +692,12 @@ class Checkers {
 			}
 		}
 	}
-	void _recursiveBuildTree(unsigned int currDepth, unsigned int depth) // рекурсивное построение дерева
+	void _recursiveBuildTree(unsigned int currDepth, unsigned int depth) // СЂРµРєСѓСЂСЃРёРІРЅРѕРµ РїРѕСЃС‚СЂРѕРµРЅРёРµ РґРµСЂРµРІР°
 	{
-		// увеличение текущей глубины
+		// СѓРІРµР»РёС‡РµРЅРёРµ С‚РµРєСѓС‰РµР№ РіР»СѓР±РёРЅС‹
 		currDepth++;
-		// если текущая глубина меньше целевой глубины, делаем ходы для всех узлов, находящихся в очереди
-		// узел добавляется в очередь как только он создаётся
+		// РµСЃР»Рё С‚РµРєСѓС‰Р°СЏ РіР»СѓР±РёРЅР° РјРµРЅСЊС€Рµ С†РµР»РµРІРѕР№ РіР»СѓР±РёРЅС‹, РґРµР»Р°РµРј С…РѕРґС‹ РґР»СЏ РІСЃРµС… СѓР·Р»РѕРІ, РЅР°С…РѕРґСЏС‰РёС…СЃСЏ РІ РѕС‡РµСЂРµРґРё
+		// СѓР·РµР» РґРѕР±Р°РІР»СЏРµС‚СЃСЏ РІ РѕС‡РµСЂРµРґСЊ РєР°Рє С‚РѕР»СЊРєРѕ РѕРЅ СЃРѕР·РґР°С‘С‚СЃСЏ
 		if (currDepth < depth) {
 			unsigned int staticQSize = _nodeQ.size();
 			for (unsigned int i = 0; i < staticQSize; ++i) {
@@ -710,8 +710,8 @@ class Checkers {
 			_recursiveBuildTree(currDepth, depth);
 		}
 		else {
-			// на последнем уровне происходит
-			// инициализация value для последнего слоя
+			// РЅР° РїРѕСЃР»РµРґРЅРµРј СѓСЂРѕРІРЅРµ РїСЂРѕРёСЃС…РѕРґРёС‚
+			// РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ value РґР»СЏ РїРѕСЃР»РµРґРЅРµРіРѕ СЃР»РѕСЏ
 			unsigned int staticQSize = _nodeQ.size();
 			for (unsigned int i = 0; i < staticQSize; ++i) {
 				_currentNode = _nodeQ.front();
@@ -722,7 +722,7 @@ class Checkers {
 		}
 	}
 
-	double _evaluateValue(TreeNode*& node) // функция расчета очков
+	double _evaluateValue(TreeNode*& node) // С„СѓРЅРєС†РёСЏ СЂР°СЃС‡РµС‚Р° РѕС‡РєРѕРІ
 	{
 		if (node->getWin() == (int)Win::winRed ||
 			node->getWin() == (int)Win::winBlack)
@@ -739,7 +739,7 @@ class Checkers {
 		return _val;
 	}
 
-	// рекурсивные функции алгоритма "альфа-бета отсечение"
+	// СЂРµРєСѓСЂСЃРёРІРЅС‹Рµ С„СѓРЅРєС†РёРё Р°Р»РіРѕСЂРёС‚РјР° "Р°Р»СЊС„Р°-Р±РµС‚Р° РѕС‚СЃРµС‡РµРЅРёРµ"
 	double _maxValue(TreeNode*& node, double alpha, double beta) {
 		if (node->getChildren().size() == 0) {
 			return node->getValue();
@@ -779,7 +779,7 @@ public:
 	Checkers(TreeNode* rootNode) {
 		_currentNode = rootNode;
 	}
-	void buildTree(int depth) // начало построения дерева 
+	void buildTree(int depth) // РЅР°С‡Р°Р»Рѕ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РґРµСЂРµРІР° 
 	{
 		if (_currentNode->getParent() == nullptr) {
 			if (_currentNode->getWin() == (int)Win::winNo) {
@@ -788,7 +788,7 @@ public:
 			}
 		}
 	}
-	double evaluateBestMove(TreeNode*& root) // запуск функции расчета лучшего балла
+	double evaluateBestMove(TreeNode*& root) // Р·Р°РїСѓСЃРє С„СѓРЅРєС†РёРё СЂР°СЃС‡РµС‚Р° Р»СѓС‡С€РµРіРѕ Р±Р°Р»Р»Р°
 	{
 		if (root->getCB().getWhosTurn() == MOVE_RED)
 			return _maxValue(root, root->getAlpha(), root->getBeta());
@@ -796,7 +796,7 @@ public:
 			return _minValue(root, root->getAlpha(), root->getBeta());
 		}
 	}
-	std::string getBestScoreNotation(TreeNode*& root) // получение нотации лучшего хода 
+	std::string getBestScoreNotation(TreeNode*& root) // РїРѕР»СѓС‡РµРЅРёРµ РЅРѕС‚Р°С†РёРё Р»СѓС‡С€РµРіРѕ С…РѕРґР° 
 	{
 		if (root->getWin() == 1) {
 			return "red win";
@@ -810,9 +810,9 @@ public:
 		if (root->getCB().getWhosTurn() == MOVE_BLACK) {
 			bestScore = _minValue(root, root->getAlpha(), root->getBeta());
 		}
-		// так как алгоритм "альфа-бета отсечения" устанавливает value одинаковым значением
-		// на всех пути от корня до листа,
-		// необходимо взять узел из детей корня с таким же значением value
+		// С‚Р°Рє РєР°Рє Р°Р»РіРѕСЂРёС‚Рј "Р°Р»СЊС„Р°-Р±РµС‚Р° РѕС‚СЃРµС‡РµРЅРёСЏ" СѓСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ value РѕРґРёРЅР°РєРѕРІС‹Рј Р·РЅР°С‡РµРЅРёРµРј
+		// РЅР° РІСЃРµС… РїСѓС‚Рё РѕС‚ РєРѕСЂРЅСЏ РґРѕ Р»РёСЃС‚Р°,
+		// РЅРµРѕР±С…РѕРґРёРјРѕ РІР·СЏС‚СЊ СѓР·РµР» РёР· РґРµС‚РµР№ РєРѕСЂРЅСЏ СЃ С‚Р°РєРёРј Р¶Рµ Р·РЅР°С‡РµРЅРёРµРј value
 		for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
 			if (root->getChildren().at(i)->getValue() == bestScore) {
 				return root->getChildren().at(i)->getNotation();
@@ -822,7 +822,7 @@ public:
 	}
 };
 
-// функция записи в файл
+// С„СѓРЅРєС†РёСЏ Р·Р°РїРёСЃРё РІ С„Р°Р№Р»
 void writeNotationToFile(std::string notation, char* outputName) {
 	std::ofstream answerFile;
 	answerFile.open(outputName);
@@ -830,7 +830,7 @@ void writeNotationToFile(std::string notation, char* outputName) {
 	answerFile.close();
 }
 
-// проверка входных данных на ошибки
+// РїСЂРѕРІРµСЂРєР° РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С… РЅР° РѕС€РёР±РєРё
 int errorCheck(std::string init) {
 	if (init.size() != 66) {
 		return (int)InputError::badSize;
@@ -872,28 +872,28 @@ int errorCheck(std::string init) {
 int main(int argc, char* argv[]) {
 	std::string answer = "Error";
 
-	// сохранение входных данных и запись номера ошибки в ответ
+	// СЃРѕС…СЂР°РЅРµРЅРёРµ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С… Рё Р·Р°РїРёСЃСЊ РЅРѕРјРµСЂР° РѕС€РёР±РєРё РІ РѕС‚РІРµС‚
 	std::string init = getStringStartPos(std::string(argv[1]));
 	answer += std::to_string(errorCheck(init));
 
-	// если ошибки нет
+	// РµСЃР»Рё РѕС€РёР±РєРё РЅРµС‚
 	if (answer.back() == '0') {
-		// узнаем глубину построения дерева
+		// СѓР·РЅР°РµРј РіР»СѓР±РёРЅСѓ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РґРµСЂРµРІР°
 		unsigned int depth = (int)init.at(65) - 48;
 		init.pop_back();
 
-		// создаётся доска
+		// СЃРѕР·РґР°С‘С‚СЃСЏ РґРѕСЃРєР°
 		CheckersBoard cb1(init);
 
-		// создается указатель на корень
+		// СЃРѕР·РґР°РµС‚СЃСЏ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РєРѕСЂРµРЅСЊ
 		TreeNode* root = new TreeNode(cb1, "noPrev");
 
-		// создаётся "шашечная партия"...
-		Checkers checkers(root); // ...с началом в корне
-		checkers.buildTree(depth); // начало построения дерева с глубиной depth
-		answer = checkers.getBestScoreNotation(root); // перезапись нотации в answer
+		// СЃРѕР·РґР°С‘С‚СЃСЏ "С€Р°С€РµС‡РЅР°СЏ РїР°СЂС‚РёСЏ"...
+		Checkers checkers(root); // ...СЃ РЅР°С‡Р°Р»РѕРј РІ РєРѕСЂРЅРµ
+		checkers.buildTree(depth); // РЅР°С‡Р°Р»Рѕ РїРѕСЃС‚СЂРѕРµРЅРёСЏ РґРµСЂРµРІР° СЃ РіР»СѓР±РёРЅРѕР№ depth
+		answer = checkers.getBestScoreNotation(root); // РїРµСЂРµР·Р°РїРёСЃСЊ РЅРѕС‚Р°С†РёРё РІ answer
 	}
-	writeNotationToFile(answer, argv[2]); // запись ответа в файл
+	writeNotationToFile(answer, argv[2]); // Р·Р°РїРёСЃСЊ РѕС‚РІРµС‚Р° РІ С„Р°Р№Р»
 
 	return 0;
 }
