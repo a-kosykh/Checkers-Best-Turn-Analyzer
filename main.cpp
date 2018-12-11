@@ -710,14 +710,6 @@ class Checkers {
 			_recursiveBuildTree(currDepth, depth);
 		}
 		else {
-			// на последнем уровне происходит
-			// инициализация value для последнего слоя
-			unsigned int staticQSize = _nodeQ.size();
-			for (unsigned int i = 0; i < staticQSize; ++i) {
-				_currentNode = _nodeQ.front();
-				_currentNode->setValue(_evaluateValue(_currentNode));
-				_nodeQ.pop();
-			}
 			return;
 		}
 	}
@@ -742,6 +734,8 @@ class Checkers {
 	// рекурсивные функции алгоритма "альфа-бета отсечение"
 	double _maxValue(TreeNode*& node, double alpha, double beta) {
 		if (node->getChildren().size() == 0) {
+			// на последнем слое считаем количество очков
+			node->setValue(_evaluateValue(node));
 			return node->getValue();
 		}
 		node->setValue(-std::numeric_limits<double>::infinity());
@@ -759,6 +753,8 @@ class Checkers {
 	}
 	double _minValue(TreeNode*& node, double alpha, double beta) {
 		if (node->getChildren().size() == 0) {
+			// на последнем слое считаем количество очков
+			node->setValue(_evaluateValue(node));
 			return node->getValue();
 		}
 		node->setValue(std::numeric_limits<double>::infinity());
