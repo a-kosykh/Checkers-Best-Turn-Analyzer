@@ -10,6 +10,7 @@ class CheckersBoard {
 public:
 	CheckersBoard() {}
 	CheckersBoard(const std::vector<int> &positions, bool move) : _board(positions), _whosTurn(move) {}
+	
 	// геттеры полей
 	std::vector<int> getBoard() const;
 	bool getWhosTurn() const;

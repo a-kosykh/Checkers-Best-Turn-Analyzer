@@ -1,22 +1,22 @@
-#pragma once
+п»ї#pragma once
 #include "CheckersBoard.hpp"
 
 
 class TreeNode {
-	CheckersBoard 				_cb; // доска
-	TreeNode* 					_parent; // указатель на родительский узел
-	std::vector<TreeNode*> 		_children; // массив всех возможных следующих ходов
-	std::string 				_prevMove; // нотация предыдущего хода
-	unsigned int 				_depth; // глубина узла в дереве
-	double 						_value, _alpha, _beta; // значения очков, альфа, бета
+	CheckersBoard 				_cb; // РґРѕСЃРєР°
+	TreeNode* 					_parent; // СѓРєР°Р·Р°С‚РµР»СЊ РЅР° СЂРѕРґРёС‚РµР»СЊСЃРєРёР№ СѓР·РµР»
+	std::vector<TreeNode*> 		_children; // РјР°СЃСЃРёРІ РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С… СЃР»РµРґСѓСЋС‰РёС… С…РѕРґРѕРІ
+	std::string 				_prevMove; // РЅРѕС‚Р°С†РёСЏ РїСЂРµРґС‹РґСѓС‰РµРіРѕ С…РѕРґР°
+	unsigned int 				_depth; // РіР»СѓР±РёРЅР° СѓР·Р»Р° РІ РґРµСЂРµРІРµ
+	double 						_value, _alpha, _beta; // Р·РЅР°С‡РµРЅРёСЏ РѕС‡РєРѕРІ, Р°Р»СЊС„Р°, Р±РµС‚Р°
 	double						_extraValue;
-	int 						_win; // обазначение победы одной из стороны
+	int 						_win; // РѕР±Р°Р·РЅР°С‡РµРЅРёРµ РїРѕР±РµРґС‹ РѕРґРЅРѕР№ РёР· СЃС‚РѕСЂРѕРЅС‹
 
 public:
 	TreeNode() {}
 	TreeNode(const CheckersBoard& start, std::string moveNotation);
 	
-	// геттеры полей
+	// РіРµС‚С‚РµСЂС‹ РїРѕР»РµР№
 	CheckersBoard getCB() const;
 	TreeNode* getParent() const;
 	std::vector<TreeNode*> getChildren() const;
@@ -28,7 +28,7 @@ public:
 	int getWin() const;
 	double getExtraScore() const;
 	
-	// сеттеры полей
+	// СЃРµС‚С‚РµСЂС‹ РїРѕР»РµР№
 	void setValue(double val);
 	void setAlpha(double a);
 	void setBeta(double b);

@@ -544,11 +544,7 @@ double Checkers::_evaluateValue(TreeNode *& node)
 
 	std::vector<int> board = node->getCB().getBoard();
 	double _val = (std::count(board.begin(), board.end(), PIECE_RED) + KING_COEF*(std::count(board.begin(), board.end(), PIECE_RED_KING)))
-		- (std::count(board.begin(), board.end(), PIECE_BLACK) + (KING_COEF)*(std::count(board.begin(), board.end(), PIECE_BLACK)));
-	if (node->getCB().getWhosTurn() == MOVE_BLACK)
-		++_val;
-	if (node->getCB().getWhosTurn() == MOVE_RED)
-		--_val;
+		- (std::count(board.begin(), board.end(), PIECE_BLACK) + (KING_COEF)*(std::count(board.begin(), board.end(), PIECE_BLACK_KING)));
 
 	return _val;
 }
@@ -661,21 +657,28 @@ std::string Checkers::getBestScoreNotation(TreeNode *& root)
 	// так как алгоритм "альфа-бета отсечения" устанавливает value одинаковым значением
 	// на всех пути от корня до листа,
 	// необходимо взять узел из детей корня с таким же значением value
+	// если оценки некоторых совпадают, запускаем дополнительное вычисление по расстоянию от боковой границы
 	TreeNode* bestNode = nullptr;
 	std::vector<TreeNode*> bestMoves;
 	for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
 		if (root->getChildren().at(i)->getValue() == bestScore)
 			bestMoves.push_back(root->getChildren().at(i));
 	}
-	for (auto i = bestMoves.begin(); i != bestMoves.end(); ++i) {
-		evaluateExtraScore(*i);
-	}
-	for (unsigned int i = 0; i < bestMoves.size(); ++i) {
-		if (bestScore < bestMoves.at(i)->getExtraScore()) {
-			bestScore = bestMoves.at(i)->getExtraScore();
-			bestNode = bestMoves.at(i);
+	if (bestMoves.size() > 1) {
+		for (auto i = bestMoves.begin(); i != bestMoves.end(); ++i) {
+			evaluateExtraScore(*i);
+		}
+
+		bestScore = bestMoves.at(0)->getExtraScore();
+		bestNode = bestMoves.at(0);
+		for (unsigned int i = 1; i < bestMoves.size(); ++i) {
+			if (bestScore < bestMoves.at(i)->getExtraScore()) {
+				bestScore = bestMoves.at(i)->getExtraScore();
+				bestNode = bestMoves.at(i);
+			}
 		}
 	}
+	else bestNode = bestMoves.at(0);
 
 	return bestNode->getNotation();
 }

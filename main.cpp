@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
 	std::string init = getStringStartPos(std::string(argv[1]));
 	answer += std::to_string(errorCheck(init));
 
+	std::string notation;
 	// если ошибки нет
 	if (answer.back() == '0') {
 		
@@ -112,8 +113,13 @@ int main(int argc, char* argv[]) {
 		Checkers checkers(root); // ...с началом в корне
 		checkers.buildTree(depth); // начало построения дерева с глубиной depth
 		answer = checkers.getBestScoreNotation(root); // перезапись нотации в answer
+
+		// для вывода всех возможный ходов корня
+		for (unsigned int i = 0; i < root->getChildren().size(); ++i) {
+			notation = notation + root->getChildren().at(i)->getNotation() + " ";
+		}
 	}
-	writeNotationToFile(answer, argv[2]); // запись ответа в файл
+	writeNotationToFile(answer , argv[2]); // запись ответа в файл
 
 	return 0;
 }
