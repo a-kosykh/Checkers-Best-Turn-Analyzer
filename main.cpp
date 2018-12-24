@@ -28,24 +28,24 @@ void writeNotationToFile(std::string notation, char* outputName) {
 
 // проверка входных данных на ошибки
 int errorCheck(std::string init) {
-	if (init.size() != 66) {
+	if (init.size() < 66) {
 		return (int)InputError::badSize;
 	}
 
-	unsigned int depth = (int)init.at(65) - 48;
-	if (depth < 0 || depth > 9) {
+	try {
+		unsigned int depth = std::stoi(init.substr(65));
+	}
+	catch (...) {
 		return (int)InputError::badDepth;
 	}
-	init.pop_back();
-
+	
 	char move = init.at(64);
 	if (move != 'r' && move != 'b') {
 		return (int)InputError::badStartTurn;
 	}
-	init.pop_back();
 
 	int zeroes = 0;
-	for (unsigned int i = 0; i < init.size(); ++i) {
+	for (unsigned int i = 0; i < 64; ++i) {
 		if (init.at(i) != '0' &&
 			init.at(i) != 'r' &&
 			init.at(i) != 'R' &&
@@ -67,7 +67,7 @@ int errorCheck(std::string init) {
 
 std::vector<int> posVec(std::string positions) {
 	std::vector<int> pos;
-	for (unsigned int i = 0; i < positions.size() - 1; ++i) {
+	for (unsigned int i = 0; i < 64; ++i) {
 		if (positions.at(i) == '0')
 			pos.push_back(PIECE_NO);
 		if (positions.at(i) == 'r')
@@ -94,10 +94,7 @@ int main(int argc, char* argv[]) {
 	// если ошибки нет
 	if (answer.back() == '0') {
 		
-		
-		// узнаем глубину построения дерева
-		unsigned int depth = (int)init.at(65) - 48;
-		init.pop_back();
+		unsigned int depth = std::stoi(init.substr(65));
 
 		bool move = false;
 		if (init.at(64) == 'b')
@@ -119,7 +116,7 @@ int main(int argc, char* argv[]) {
 			notation = notation + root->getChildren().at(i)->getNotation() + " ";
 		}
 	}
-	writeNotationToFile(answer , argv[2]); // запись ответа в файл
+	writeNotationToFile(answer, argv[2]); // запись ответа в файл
 
 	return 0;
 }

@@ -1,5 +1,37 @@
 ﻿#include "checkers.hpp"
 
+int Checkers::_pieceOpponent(bool king, TreeNode* node)
+{
+	if (node->getCB().getWhosTurn() == MOVE_RED) {
+		if (!king) {
+			return PIECE_BLACK;
+		}
+		else return PIECE_BLACK_KING;
+	}
+	else {
+		if (!king) {
+			return PIECE_RED;
+		}
+		else return PIECE_RED_KING;
+	}
+}
+
+int Checkers::_pieceFriend(bool king, TreeNode* node)
+{
+	if (node->getCB().getWhosTurn() == MOVE_RED) {
+		if (!king) {
+			return PIECE_RED;
+		}
+		else return PIECE_RED_KING;
+	}
+	else {
+		if (!king) {
+			return PIECE_BLACK;
+		}
+		else return PIECE_BLACK_KING;
+	}
+}
+
 bool Checkers::_isLegaltoKing(int finalPos)
 {
 	if (_currentNode->getCB().getWhosTurn() == MOVE_RED) {
@@ -13,6 +45,68 @@ bool Checkers::_isLegaltoKing(int finalPos)
 		}
 	}
 	return false;
+}
+
+bool Checkers::_isLegaltoCombatUpLeft(std::vector<int> tempBoard, int pos)
+{	
+	if (pos >= 19) {
+		if ((tempBoard[pos - 9] == _pieceOpponent(false, _currentNode) || tempBoard[pos - 9] == _pieceOpponent(true, _currentNode))
+			&& tempBoard[pos - 9 - 9] == PIECE_NO && (pos % 8) > 1
+			&& (pos > 16))
+			return true;
+	}
+	return false;
+}
+
+bool Checkers::_isLegaltoCombatUpRight(std::vector<int> tempBoard, int pos)
+{
+	if (pos >= 17) {
+		if ((tempBoard[pos - 7] == _pieceOpponent(false, _currentNode) || tempBoard[pos - 7] == _pieceOpponent(true, _currentNode))
+			&& tempBoard[pos - 7 - 7] == PIECE_NO && (pos % 8) < 6
+			&& (pos > 16))
+			return true;
+	}
+	return false;
+}
+
+bool Checkers::_isLegaltoCombatDownRight(std::vector<int> tempBoard, int pos)
+{
+	if (pos <= 44) {
+		if ((tempBoard[pos + 9] == _pieceOpponent(false, _currentNode) || tempBoard[pos + 9] == _pieceOpponent(true, _currentNode))
+			&& tempBoard[pos + 9 + 9] == PIECE_NO && (pos % 8) < 6)
+			return true;
+	}
+	return false;
+}
+
+bool Checkers::_isLegaltoCombatDownLeft(std::vector<int> tempBoard, int pos)
+{
+	if (pos <= 46) {
+		if ((tempBoard[pos + 7] == _pieceOpponent(false, _currentNode) || tempBoard[pos + 7] == _pieceOpponent(true, _currentNode))
+			&& tempBoard[pos + 7 + 7] == PIECE_NO && (pos % 8) > 1)
+			return true;
+	}
+	return false;
+}
+
+std::vector<int> Checkers::_swapCombatPieces(std::vector<int> tempBoard, int startPos, int nullPos,
+	int finalPos, bool toKing)
+{
+	std::swap(tempBoard[startPos], tempBoard[finalPos]);
+	tempBoard[nullPos] = PIECE_NO;
+	if (toKing) {
+		tempBoard[finalPos] = _pieceFriend(true, _currentNode);
+	}
+	return tempBoard;
+}
+
+std::string Checkers::_createNotation(std::string notation, int finalPos, bool isCombat)
+{
+	char mark = '-';
+	if (isCombat)
+		mark = 'x';
+	notation = notation + mark + std::to_string(finalPos);
+	return notation;
 }
 
 void Checkers::_createNoFightNode(int startPos, int finalPos)
@@ -113,44 +207,28 @@ void Checkers::_moveNoFightBlack(int pos)
 
 void Checkers::_moveCombatKing(int pos, std::vector<int> tempBoard, std::string tempNotation)
 {
-	char friendPiece, friendKing, oppoPiece, oppoKing;
-	if (_currentNode->getCB().getWhosTurn() == MOVE_RED) {
-		friendPiece = PIECE_RED;
-		friendKing = PIECE_RED_KING;
-		oppoPiece = PIECE_BLACK;
-		oppoKing = PIECE_BLACK_KING;
-	}
-	if (_currentNode->getCB().getWhosTurn() == MOVE_BLACK) {
-		friendPiece = PIECE_BLACK;
-		friendKing = PIECE_BLACK_KING;
-		oppoPiece = PIECE_RED;
-		oppoKing = PIECE_RED_KING;
-	}
-
 	bool combat = false;
 	// UP LEFT
 	if (pos % 8 > 1) {
 		for (int i = pos - 9; i > 0; i -= 9) {
 			if (i % 8 != 0 && i > 8) {
-				if (tempBoard.at(i) == oppoPiece ||
-					tempBoard.at(i) == oppoKing) {
+				if (tempBoard.at(i) == _pieceOpponent(false, _currentNode) ||
+					tempBoard.at(i) == _pieceOpponent(true, _currentNode)) {
 					if (tempBoard.at(i - 9) == PIECE_NO) {
+						int finalPos = i - 9;
 						combat = true;
 
-						std::vector<int> tempBoard1 = tempBoard;
-						std::swap(tempBoard1[pos], tempBoard1[i - 9]);
-						tempBoard1[i] = PIECE_NO;
+						_moveCombatKing(
+							finalPos, 
+							_swapCombatPieces(tempBoard,pos, i, finalPos,false), 
+							_createNotation(tempNotation,finalPos,true));
 
-						std::string notation = tempNotation + 'x'
-							+ std::to_string(i - 9);
-
-						_moveCombatKing(i - 9, tempBoard1, notation);
 						break;
 					}
 					else break;
 				}
-				if (tempBoard.at(i) == friendPiece ||
-					tempBoard.at(i) == friendKing) {
+				if (tempBoard.at(i) == _pieceFriend(false, _currentNode) ||
+					tempBoard.at(i) == _pieceFriend(true, _currentNode)) {
 					break;
 				}
 			}
@@ -161,25 +239,23 @@ void Checkers::_moveCombatKing(int pos, std::vector<int> tempBoard, std::string 
 	if (pos % 8 < 7) {
 		for (int i = pos - 7; i > 0; i -= 7) {
 			if (i % 8 != 7 && i > 8) {
-				if (tempBoard.at(i) == oppoPiece ||
-					tempBoard.at(i) == oppoKing) {
+				if (tempBoard.at(i) == _pieceOpponent(false, _currentNode) ||
+					tempBoard.at(i) == _pieceOpponent(true, _currentNode)) {
 					if (tempBoard.at(i - 7) == PIECE_NO) {
+						int finalPos = i - 7;
 						combat = true;
 
-						std::vector<int> tempBoard1 = tempBoard;
-						std::swap(tempBoard1[pos], tempBoard1[i - 7]);
-						tempBoard1[i] = PIECE_NO;
+						_moveCombatKing(
+							finalPos,
+							_swapCombatPieces(tempBoard, pos, i, finalPos, false),
+							_createNotation(tempNotation, finalPos, true));
 
-						std::string notation = tempNotation + 'x'
-							+ std::to_string(i - 7);
-
-						_moveCombatKing(i - 7, tempBoard1, notation);
 						break;
 					}
 					else break;
 				}
-				if (tempBoard.at(i) == friendPiece ||
-					tempBoard.at(i) == friendKing) {
+				if (tempBoard.at(i) == _pieceFriend(false, _currentNode) ||
+					tempBoard.at(i) == _pieceFriend(true, _currentNode)) {
 					break;
 				}
 			}
@@ -190,25 +266,23 @@ void Checkers::_moveCombatKing(int pos, std::vector<int> tempBoard, std::string 
 	if (pos % 8 < 7) {
 		for (int i = pos + 9; i < 63; i += 9) {
 			if (i % 8 != 7 && i < 55) {
-				if (tempBoard.at(i) == oppoPiece ||
-					tempBoard.at(i) == oppoKing) {
+				if (tempBoard.at(i) == _pieceOpponent(false, _currentNode) ||
+					tempBoard.at(i) == _pieceOpponent(true, _currentNode)) {
 					if (tempBoard.at(i + 9) == PIECE_NO) {
+						int finalPos = i + 9;
 						combat = true;
 
-						std::vector<int> tempBoard1 = tempBoard;
-						std::swap(tempBoard1[pos], tempBoard1[i + 9]);
-						tempBoard1[i] = PIECE_NO;
+						_moveCombatKing(
+							finalPos,
+							_swapCombatPieces(tempBoard, pos, i, finalPos, false),
+							_createNotation(tempNotation, finalPos, true));
 
-						std::string notation = tempNotation + 'x'
-							+ std::to_string(i + 9);
-
-						_moveCombatKing(i + 9, tempBoard1, notation);
 						break;
 					}
 					else break;
 				}
-				if (_currentNode->getCB().getBoard().at(i) == friendPiece ||
-					_currentNode->getCB().getBoard().at(i) == friendKing) {
+				if (tempBoard.at(i) == _pieceFriend(false, _currentNode) ||
+					tempBoard.at(i) == _pieceFriend(true, _currentNode)) {
 					break;
 				}
 			}
@@ -219,25 +293,23 @@ void Checkers::_moveCombatKing(int pos, std::vector<int> tempBoard, std::string 
 	if (pos % 8 > 1) {
 		for (int i = pos + 7; i < 63; i += 7) {
 			if (i % 8 != 0 && i < 55) {
-				if (tempBoard.at(i) == oppoPiece ||
-					tempBoard.at(i) == oppoKing) {
+				if (tempBoard.at(i) == _pieceOpponent(false, _currentNode) ||
+					tempBoard.at(i) == _pieceOpponent(true , _currentNode)) {
 					if (tempBoard.at(i + 7) == PIECE_NO) {
+						int finalPos = i + 7;
 						combat = true;
 
-						std::vector<int> tempBoard1 = tempBoard;
-						std::swap(tempBoard1[pos], tempBoard1[i + 7]);
-						tempBoard1[i] = PIECE_NO;
+						_moveCombatKing(
+							finalPos,
+							_swapCombatPieces(tempBoard, pos, i, finalPos, false),
+							_createNotation(tempNotation, finalPos, true));
 
-						std::string notation = tempNotation + 'x'
-							+ std::to_string(i + 7);
-
-						_moveCombatKing(i + 7, tempBoard1, notation);
 						break;
 					}
 					else break;
 				}
-				if (tempBoard.at(i) == friendPiece ||
-					tempBoard.at(i) == friendKing) {
+				if (tempBoard.at(i) == _pieceFriend(false, _currentNode) ||
+					tempBoard.at(i) == _pieceFriend(true, _currentNode)) {
 					break;
 				}
 			}
@@ -256,88 +328,64 @@ void Checkers::_moveCombatKing(int pos, std::vector<int> tempBoard, std::string 
 
 void Checkers::_moveCombatRed(int pos, std::vector<int> tempBoard, std::string tempNotation)
 {
-	// CHECK FORWARD MOVE LEFT
 	bool combat = false;
-	if (pos <= 46) {
-		if ((tempBoard[pos + 7] == PIECE_BLACK || tempBoard[pos + 7] == PIECE_BLACK_KING)
-			&& tempBoard[pos + 7 + 7] == PIECE_NO && (pos % 8) > 1) {
+	
+	// DOWN LEFT
+	if (_isLegaltoCombatDownLeft(tempBoard, pos)) {
+		int finalPos = pos + 7 + 7; // DOWNLEFT
+		
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos + 7 + 7]);
-			tempBoard1[pos + 7] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos + 7 + 7);
-
-			if (pos + 7 + 7 >= 56) {
-				tempBoard1[pos + 7 + 7] = PIECE_RED_KING;
-				_moveCombatKing(pos + 7 + 7, tempBoard1, notation);
-			}
-			else {
-				_moveCombatRed(pos + 7 + 7, tempBoard1, notation);
-			}
+		if (finalPos >= 56) {
+			_moveCombatKing(
+				finalPos, 
+				_swapCombatPieces(tempBoard, pos, pos + 7, finalPos, true), 
+				_createNotation(tempNotation, finalPos, true));
+		}
+		else {
+			_moveCombatRed(
+				finalPos, 
+				_swapCombatPieces(tempBoard, pos, pos + 7, finalPos, false), 
+				_createNotation(tempNotation, finalPos, true));
 		}
 	}
-	if (pos <= 44) {
-		// CHECK FORWARD MOVE RIGHT
-		if ((tempBoard[pos + 9] == PIECE_BLACK || tempBoard[pos + 9] == PIECE_BLACK_KING)
-			&& tempBoard[pos + 9 + 9] == PIECE_NO && (pos % 8) < 6) {
+	// DOWN RIGHT
+	if (_isLegaltoCombatDownRight(tempBoard,pos)){
+		int finalPos = pos + 9 + 9;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos + 9 + 9]);
-			tempBoard1[pos + 9] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos + 9 + 9);
-
-			if (pos + 9 + 9 >= 56) {
-				tempBoard1[pos + 9 + 9] = PIECE_RED_KING;
-				_moveCombatKing(pos + 9 + 9, tempBoard1, notation);
-			}
-			else {
-				_moveCombatRed(pos + 9 + 9, tempBoard1, notation);
-			}
+		if (finalPos >= 56) {
+			_moveCombatKing(
+				finalPos, 
+				_swapCombatPieces(tempBoard,pos, pos + 9,finalPos,true), 
+				_createNotation(tempNotation, finalPos, true));
+		}
+		else {
+			_moveCombatRed(
+				finalPos,
+				_swapCombatPieces(tempBoard, pos, pos + 9, finalPos, false),
+				_createNotation(tempNotation, finalPos, true));
 		}
 	}
-	if (pos >= 19) {
-		// CHECK BACK MOVE LEFT
-		if ((tempBoard[pos - 9] == PIECE_BLACK || tempBoard[pos - 9] == PIECE_BLACK_KING)
-			&& tempBoard[pos - 9 - 9] == PIECE_NO && (pos % 8) > 1
-			&& (pos > 16)) {
+	// UP LEFT
+	if (_isLegaltoCombatUpLeft(tempBoard, pos)) {
+		int finalPos = pos - 9 - 9;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos - 9 - 9]);
-			tempBoard1[pos - 9] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos - 9 - 9);
-
-			_moveCombatRed(pos - 9 - 9, tempBoard1, notation);
-		}
+		_moveCombatRed(
+			finalPos, 
+			_swapCombatPieces(tempBoard,pos, pos - 9, finalPos, false),
+			_createNotation(tempNotation,finalPos,true));
 	}
-	if (pos >= 17) {
-		// CHECK BACK MOVE RIGHT
-		if ((tempBoard[pos - 7] == PIECE_BLACK || tempBoard[pos - 7] == PIECE_BLACK_KING)
-			&& tempBoard[pos - 7 - 7] == PIECE_NO && (pos % 8) < 6
-			&& (pos > 16)) {
+	// UP RIGHT
+	if (_isLegaltoCombatUpRight(tempBoard, pos)) {
+		int finalPos = pos - 7 - 7;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos - 7 - 7]);
-			tempBoard1[pos - 7] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos - 7 - 7);
-
-			_moveCombatRed(pos - 7 - 7, tempBoard1, notation);
-		}
+		_moveCombatRed(
+			finalPos, 
+			_swapCombatPieces(tempBoard, pos, pos - 7, finalPos, false),
+			_createNotation(tempNotation, finalPos, true));
 	}
 	// END RECURSION
 	if (tempBoard != _currentNode->getCB().getBoard() && combat == false) {
@@ -351,87 +399,61 @@ void Checkers::_moveCombatBlack(int pos, std::vector<int> tempBoard, std::string
 // условия и создание дочернего узла при бое черной шашки
 {
 	bool combat = false;
-	if (pos >= 19) {
-		// CHECK FORWARD MOVE LEFT
-		if ((tempBoard[pos - 9] == PIECE_RED || tempBoard[pos - 9] == PIECE_RED_KING)
-			&& tempBoard[pos - 9 - 9] == PIECE_NO && (pos % 8) > 1
-			&& (pos > 16)) {
+	// UP LEFT
+	if (_isLegaltoCombatUpLeft(tempBoard, pos)){
+		int finalPos = pos - 9 - 9;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos - 9 - 9]);
-			tempBoard1[pos - 9] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos - 9 - 9);
-
-			if (pos - 9 - 9 <= 7) {
-				tempBoard1[pos - 9 - 9] = PIECE_BLACK_KING;
-				_moveCombatKing(pos - 9 - 9, tempBoard1, notation);
+		if (finalPos <= 7) {
+			_moveCombatKing(
+				finalPos,
+				_swapCombatPieces(tempBoard, pos, pos - 9, finalPos, true),
+				_createNotation(tempNotation, finalPos, true));
 			}
-			else {
-				_moveCombatRed(pos - 9 - 9, tempBoard1, notation);
-			}
+		else {
+			_moveCombatBlack(
+				finalPos,
+				_swapCombatPieces(tempBoard, pos, pos - 9, finalPos, false),
+				_createNotation(tempNotation, finalPos, true));
 		}
 	}
-	if (pos >= 17) {
-		// CHECK FORWARD MOVE RIGHT
-		if ((tempBoard[pos - 7] == PIECE_RED || tempBoard[pos - 7] == PIECE_RED_KING)
-			&& tempBoard[pos - 7 - 7] == PIECE_NO && (pos % 8) < 6
-			&& (pos > 16)) {
+	// UP RIGHT
+	if (_isLegaltoCombatUpRight(tempBoard, pos)) {
+		int finalPos = pos - 7 - 7;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos - 7 - 7]);
-			tempBoard1[pos - 7] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos - 7 - 7);
-
-			if (pos - 7 - 7 <= 7) {
-				tempBoard1[pos - 7 - 7] = PIECE_BLACK_KING;
-				_moveCombatKing(pos - 7 - 7, tempBoard1, notation);
-			}
-			else {
-				_moveCombatRed(pos - 7 - 7, tempBoard1, notation);
-			}
+		if (finalPos <= 7) {
+				_moveCombatKing(
+					finalPos,
+					_swapCombatPieces(tempBoard, pos, pos - 7 , finalPos, true),
+					_createNotation(tempNotation, finalPos, true));
+		}
+		else {
+				_moveCombatBlack(
+					finalPos,
+					_swapCombatPieces(tempBoard, pos, pos - 7, finalPos, false),
+					_createNotation(tempNotation, finalPos, true));
 		}
 	}
-	if (pos <= 46) {
-		// CHECK BACK MOVE LEFT
-		if ((tempBoard[pos + 7] == PIECE_RED || tempBoard[pos + 7] == PIECE_RED_KING)
-			&& tempBoard[pos + 7 + 7] == PIECE_NO && (pos % 8) > 1) {
+	// DOWN LEFT
+	if (_isLegaltoCombatDownLeft(tempBoard, pos)) {
+		int finalPos = pos + 7 + 7;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos + 7 + 7]);
-			tempBoard1[pos + 7] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos + 7 + 7);
-
-			_moveCombatBlack(pos + 7 + 7, tempBoard1, notation);
-		}
+		_moveCombatBlack(
+			finalPos,
+			_swapCombatPieces(tempBoard, pos, pos + 7, finalPos, false),
+			_createNotation(tempNotation, finalPos, true));
 	}
-	if (pos <= 44) {
-		// CHECK BACK MOVE RIGHT
-		if ((tempBoard[pos + 9] == PIECE_RED || tempBoard[pos + 9] == PIECE_RED_KING)
-			&& tempBoard[pos + 9 + 9] == PIECE_NO && (pos % 8) < 6) {
+	// DOWN RIGHT
+	if (_isLegaltoCombatDownRight(tempBoard, pos)) {
+		int finalPos = pos + 9 + 9;
+		combat = true;
 
-			combat = true;
-
-			std::vector<int> tempBoard1 = tempBoard;
-			std::swap(tempBoard1[pos], tempBoard1[pos + 9 + 9]);
-			tempBoard1[pos + 9] = PIECE_NO;
-
-			std::string notation = tempNotation + 'x'
-				+ std::to_string(pos + 9 + 9);
-
-			_moveCombatBlack(pos + 9 + 9, tempBoard1, notation);
-		}
+		_moveCombatBlack(
+			finalPos,
+			_swapCombatPieces(tempBoard, pos,pos + 9, finalPos, false),
+			_createNotation(tempNotation, finalPos, true));
 	}
 	// END RECURSION
 	if (tempBoard != _currentNode->getCB().getBoard() && combat == false) {
@@ -621,16 +643,10 @@ double Checkers::evaluateBestMove(TreeNode *& root)
 
 void Checkers::evaluateExtraScore(TreeNode *& node)
 {
-	int friendPiece = PIECE_RED;
-	int friendKing = PIECE_RED_KING;
-	if (node->getCB().getWhosTurn() == MOVE_BLACK) {
-		friendPiece = PIECE_BLACK;
-		friendKing = PIECE_BLACK_KING;
-	}
 	double score = 0;
 	for (unsigned int i = 0; i < node->getCB().getBoard().size(); ++i) {
-		if (node->getCB().getBoard().at(i) == friendPiece ||
-			node->getCB().getBoard().at(i) == friendKing) {
+		if (node->getCB().getBoard().at(i) == _pieceOpponent(false, node) ||
+			node->getCB().getBoard().at(i) == _pieceOpponent(true, node)) {
 			if ((i % 8) <= 3)
 				score += 4 - (i % 8);
 			else score += (i % 8) - 4;

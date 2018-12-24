@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <queue>
 #include <limits>
+#include <exception>
 
 #define BOARD_ROWS 8
 #define BOARD_COLUMNS 8
